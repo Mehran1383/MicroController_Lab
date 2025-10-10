@@ -14,7 +14,7 @@
 #include "STM_MY_LCD16X2.h"
 
 #define DELAY 500
-#define LONGER_DELAY 5 * 500
+#define LONGER_DELAY 4 * DELAY
 #define BUF_SIZE 8
 
 const char data_key[] = {
@@ -29,7 +29,7 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 
 int get_num(void);
-char get_opr(void);
+char get_op(void);
 void error_routine(int error_type);
 void show_on_LCD(int key);
 
@@ -65,48 +65,45 @@ int main(void)
 	// Only in write mode
 	HAL_GPIO_WritePin(GPIOA, RW_Pin, 0);
 	
-	int num1, num2, result;
+	int num1, num2;
 	char operation;
 
   while (1) {
 		// Get the first number
 		if ((num1 = get_num()) < 0) {
-			error_routine(num1);
+			error_routine(NOT_DETECTED);
 			continue;
 		}
 			
 		// Get the operation
-		if ((operation = get_opr()) < 0) {
-			error_routine(operation);
+		if ((operation = get_op()) < 0) {
+			error_routine(NOT_DETECTED);
 			continue;
 		}
 
 		// Get the second number
 		if ((num2 = get_num()) < 0) {
-			error_routine(num2);
+			error_routine(NOT_DETECTED);
 			continue;
 		}
 		
 		// Get the `=` to calculate the expression
-		if (get_opr() != '=') {
+		if (get_op() != '=') {
 			error_routine(INVALID_INPUT);
 			continue;
 		}
 		
 		// Calculation
 		if (operation == '-') {
-			result = num1 - num2;
-			LCD1602_PrintInt(result);
+			LCD1602_PrintInt(num1 - num2);
 			HAL_Delay(DELAY);
 		} 
 		else if (operation == '+') {
-			result = num1 + num2;
-			LCD1602_PrintInt(result);
+			LCD1602_PrintInt(num1 + num2);
 			HAL_Delay(DELAY);
 		} 
 		else if (operation == '*') {
-			result = num1 * num2;
-			LCD1602_PrintInt(result);
+			LCD1602_PrintInt(num1 * num2);
 			HAL_Delay(DELAY);
 		} 
 		else if (operation == '/') {
@@ -129,7 +126,7 @@ int main(void)
 }
 
 /**
-  * @brief Get a digit from keypad, show it on LCD and return it.
+  * @brief Get a digit from keypad, show it on LCD and return it
   * @retval Pressed key
   */
 int get_num(void) 
@@ -153,10 +150,10 @@ int get_num(void)
 }
 
 /**
-  * @brief Get an operation from keypad, show it on LCD and return it.
+  * @brief Get an operation from keypad, show it on LCD and return it
   * @retval Pressed key
   */
-char get_opr(void)
+char get_op(void)
 {
 	int key;
 	char operation;
@@ -178,7 +175,7 @@ char get_opr(void)
 }
 
 /**
-  * @brief Show the key pressed, on LCD.
+  * @brief Show the key pressed on LCD
 	* @param The key, which is the index of data_key[]
   * @retval None
   */
@@ -207,6 +204,9 @@ void error_routine(int error_type)
 			break;
 		case ERROR:
 			LCD1602_print("INVALID EXPR!");
+			break;
+		default:
+			LCD1602_print("UNKNOWN ERROR!");
 	}
 	
 	HAL_Delay(LONGER_DELAY);

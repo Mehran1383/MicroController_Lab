@@ -1,10 +1,5 @@
-#include "stm32f4xx_hal.h"
-
-/*
-	GPIOE0-3 -> C1-4 as INPUT
-	GPIOE4-7 -> R1-4 as OUTPUT
-*/
-#define KEYPAD_PORT GPIOE
+#ifndef KEYPAD_H
+#define KEYPAD_H
 
 // Error types
 #define NOT_DETECTED -1
@@ -32,7 +27,9 @@ int keypad_read_pin(const char pin);
 int keypad_read(void);
 
 /**
-  * @brief Resolve which key is being pressed
-  * @retval The key which is pressed
+  * @brief Resolve which key is being pressed otherwise return the error
+  * @retval The key which was pressed
   */
 int keypad(void);
+
+#endif

@@ -1,4 +1,11 @@
+#include "stm32f4xx.h"
 #include "keypad.h"
+
+/*
+	GPIOE0-3 -> C1-4 as INPUT
+	GPIOE4-7 -> R1-4 as OUTPUT
+*/
+#define KEYPAD_PORT GPIOE
 
 void keypad_write(const char data)
 {
@@ -12,7 +19,7 @@ int keypad_read_pin(const char pin)
 
 int keypad_read(void)
 {
-	return (KEYPAD_PORT->IDR & 0xFF);
+	return KEYPAD_PORT->IDR & 0xFF;
 }
 
 int keypad(void)
@@ -32,15 +39,14 @@ int keypad(void)
 		else if (keypad_read_pin(3)) 
 			c = 3;
 		
+		// Reset pins to initial state
+		keypad_write(0xF0);
 		if (c != NOT_DETECTED) {
 			key = (r * 4) + c;
-			keypad_write(0xF0);
 			while (keypad_read_pin(c))
 				;
 			break;
-		}
-		
-		keypad_write(0xF0);
+		}		
 	}
 	return key;			
 }
