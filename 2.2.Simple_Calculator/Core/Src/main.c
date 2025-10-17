@@ -141,7 +141,7 @@ int get_num(void)
 	if (key != NOT_DETECTED) {
 		show_on_LCD(key);
 		num = data_key[key] - '0';	
-		if (isdigit(data_key[key] - '0'))
+		if (isdigit(data_key[key]))
 			return num;
 		else
 			return INVALID_INPUT;
